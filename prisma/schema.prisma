@@ -1,0 +1,76 @@
+// Prisma schema adapted for Cloudflare D1
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("member") // member or admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  calendarEvents CalendarEvent[]
+  travelPlans    TravelPlan[]
+  newsEntries    NewsEntry[]
+}
+
+model CalendarEvent {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  location    String?
+  allDay      Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([startDate])
+  @@index([createdBy])
+}
+
+model TravelPlan {
+  id          String   @id @default(uuid())
+  title       String
+  destination String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  itinerary   String?  // JSON string for detailed itinerary
+  budget      Float?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([startDate])
+  @@index([createdBy])
+}
+
+model NewsEntry {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([createdBy])
+}
+

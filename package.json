@@ -1,0 +1,54 @@
+{
+  "name": "family-hub",
+  "version": "1.0.0",
+  "description": "A Nuxt 4 family hub application with calendar, travel planner, and news features",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,ts,vue,json,md}\"",
+    "db:generate": "prisma generate",
+    "db:push": "wrangler d1 execute family-hub-db --local --file=./prisma/migrations/schema.sql",
+    "db:seed": "tsx scripts/seed.ts",
+    "wrangler:dev": "wrangler pages dev --compatibility-date=2024-01-01 .output/public",
+    "deploy": "npm run build && wrangler pages deploy .output/public"
+  },
+  "dependencies": {
+    "@prisma/adapter-d1": "^5.22.0",
+    "@prisma/client": "^5.22.0",
+    "@vueuse/core": "^11.2.0",
+    "bcrypt": "^5.1.1",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "jose": "^5.9.6",
+    "lucide-vue-next": "^0.462.0",
+    "nuxt": "^3.14.1592",
+    "radix-vue": "^1.9.8",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7",
+    "vue": "^3.5.13",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "@eslint/js": "^9.15.0",
+    "@nuxtjs/tailwindcss": "^6.12.2",
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.16.0",
+    "@typescript-eslint/parser": "^8.16.0",
+    "eslint": "^9.15.0",
+    "prettier": "^3.3.3",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.90.0"
+  }
+}
+

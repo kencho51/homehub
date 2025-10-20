@@ -1,0 +1,19 @@
+# Cloudflare Wrangler Configuration
+# Copy this file to wrangler.toml and update with your values
+
+name = "family-hub"
+compatibility_date = "2024-01-01"
+
+# Cloudflare Pages configuration
+pages_build_output_dir = ".output/public"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "family-hub-db"
+database_id = "your-database-id-here"  # Replace with your actual D1 database ID
+
+# Environment variables (secrets)
+# Set these using: wrangler secret put <KEY>
+# - JWT_SECRET
+
