@@ -30,5 +30,8 @@ dev.db-journal
 *.db-journal
 
 # Wrangler
+wrangler.toml
 .wrangler
 .dev.vars
+
+history.md
