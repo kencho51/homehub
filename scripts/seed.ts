@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcrypt'
+import { webcrypto } from 'node:crypto'
 
 /**
  * Seed script for SQLite/Prisma development
@@ -9,20 +9,51 @@ import bcrypt from 'bcrypt'
  * - john@family-hub.com / test123 (John Doe)
  * - jane@family-hub.com / test123 (Jane Smith)
  *
- * For D1 database, use: npm run db:seed (runs prisma/seed.sql)
- * For SQLite file, use: npm run tsx scripts/seed.ts
- *
- * Both approaches create the SAME test users with SAME credentials.
+ * Uses Web Crypto API (PBKDF2) for password hashing - compatible with Cloudflare Workers
  */
 
 const prisma = new PrismaClient()
 
+// Password hashing using Web Crypto API (same as lib/auth.ts)
+async function hashPassword(password: string): Promise<string> {
+  const ITERATIONS = 100000
+  const HASH_LENGTH = 32
+  const ALGORITHM = 'SHA-256'
+
+  const salt = webcrypto.getRandomValues(new Uint8Array(16))
+
+  const passwordKey = await webcrypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  )
+
+  const hashBuffer = await webcrypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: ITERATIONS,
+      hash: ALGORITHM,
+    },
+    passwordKey,
+    HASH_LENGTH * 8
+  )
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashBase64 = Buffer.from(hashArray).toString('base64')
+  const saltBase64 = Buffer.from(salt).toString('base64')
+
+  return `${ITERATIONS}:${saltBase64}:${hashBase64}`
+}
+
 async function main() {
   console.log('🌱 Starting database seeding...')
 
-  // Hash passwords (matches credentials in prisma/seed.sql)
-  const adminPassword = await bcrypt.hash('admin123', 10)
-  const testPassword = await bcrypt.hash('test123', 10)
+  // Hash passwords using Web Crypto API
+  const adminPassword = await hashPassword('admin123')
+  const testPassword = await hashPassword('test123')
 
   // Create admin user
   const admin = await prisma.user.upsert({

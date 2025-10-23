@@ -1,25 +1,59 @@
-import bcrypt from 'bcrypt'
+import { webcrypto } from 'node:crypto'
 
 /**
- * Generate bcrypt hashes for seed data
+ * Generate password hashes for seed data using Web Crypto API
  *
  * This utility generates password hashes that match the test credentials:
  * - admin@family-hub.com / admin123 (Admin User)
  * - john@family-hub.com / test123 (John Doe)
  * - jane@family-hub.com / test123 (Jane Smith)
  *
- * Note: Bcrypt generates different hashes each time due to random salts,
- * but all valid hashes for the same password will verify correctly.
+ * Uses PBKDF2 (Web Crypto API) - compatible with Cloudflare Workers
  *
- * The current hashes in prisma/seed.sql are valid. Only regenerate if needed.
+ * Note: Each hash is unique due to random salts, but all valid hashes
+ * for the same password will verify correctly.
  *
  * Usage: npm run tsx scripts/generate-hashes.ts
  */
-async function generateHashes() {
-  console.log('🔐 Generating bcrypt hashes for seed data...\n')
 
-  const admin123 = await bcrypt.hash('admin123', 10)
-  const test123 = await bcrypt.hash('test123', 10)
+async function hashPassword(password: string): Promise<string> {
+  const ITERATIONS = 100000
+  const HASH_LENGTH = 32
+  const ALGORITHM = 'SHA-256'
+
+  const salt = webcrypto.getRandomValues(new Uint8Array(16))
+
+  const passwordKey = await webcrypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  )
+
+  const hashBuffer = await webcrypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: ITERATIONS,
+      hash: ALGORITHM,
+    },
+    passwordKey,
+    HASH_LENGTH * 8
+  )
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashBase64 = Buffer.from(hashArray).toString('base64')
+  const saltBase64 = Buffer.from(salt).toString('base64')
+
+  return `${ITERATIONS}:${saltBase64}:${hashBase64}`
+}
+
+async function generateHashes() {
+  console.log('🔐 Generating password hashes using Web Crypto API (PBKDF2)...\n')
+
+  const admin123 = await hashPassword('admin123')
+  const test123 = await hashPassword('test123')
 
   console.log('Admin User (admin@family-hub.com):')
   console.log('  Password: admin123')
@@ -29,8 +63,8 @@ async function generateHashes() {
   console.log('  Password: test123')
   console.log('  Hash: ' + test123)
 
-  console.log('\n📝 If you need to update prisma/seed.sql, use these new hashes.')
-  console.log('⚠️  Current hashes in seed.sql are already valid - only update if needed!')
+  console.log('\n📝 Use these hashes in your seed data.')
+  console.log('✨ Compatible with both Node.js and Cloudflare Workers!')
 }
 
 generateHashes()
