@@ -23,6 +23,7 @@ Use the login or register endpoints to obtain a token.
 All responses follow this format:
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -31,6 +32,7 @@ All responses follow this format:
 ```
 
 ### Error Response
+
 ```json
 {
   "statusCode": 400,
@@ -44,20 +46,25 @@ All responses follow this format:
 ### Authentication
 
 #### Register User
+
 ```http
 POST /api/auth/register
 ```
 
 **Request Body:**
+
 ```json
 {
   "name": "John Doe",
-  "email": "john@example.com",
+  "email": "john",
   "password": "password123"
 }
 ```
 
+**Note:** The `email` field is used for username (not email format required).
+
 **Response:**
+
 ```json
 {
   "success": true,
@@ -65,31 +72,37 @@ POST /api/auth/register
   "user": {
     "id": "uuid",
     "name": "John Doe",
-    "email": "john@example.com",
+    "email": "john",
     "role": "member"
   }
 }
 ```
 
 **Validation Rules:**
+
 - `name`: 2-100 characters
-- `email`: Valid email format
+- `email`: 1-100 characters (username, no email format required)
 - `password`: 6-100 characters
 
 #### Login
+
 ```http
 POST /api/auth/login
 ```
 
 **Request Body:**
+
 ```json
 {
-  "email": "john@example.com",
+  "email": "john",
   "password": "password123"
 }
 ```
 
+**Note:** The `email` field is used for username (not email format required).
+
 **Response:**
+
 ```json
 {
   "success": true,
@@ -97,30 +110,33 @@ POST /api/auth/login
   "user": {
     "id": "uuid",
     "name": "John Doe",
-    "email": "john@example.com",
+    "email": "john",
     "role": "member"
   }
 }
 ```
 
 #### Get Current User
+
 ```http
 GET /api/auth/me
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
   "user": {
     "id": "uuid",
     "name": "John Doe",
-    "email": "john@example.com",
+    "email": "john",
     "role": "member",
     "createdAt": "2024-01-01T00:00:00.000Z"
   }
@@ -132,21 +148,25 @@ Authorization: Bearer <token>
 ### Calendar Events
 
 #### List All Events
+
 ```http
 GET /api/calendar
 GET /api/calendar?startDate=2024-01-01T00:00:00.000Z&endDate=2024-12-31T23:59:59.999Z
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Query Parameters:**
+
 - `startDate` (optional): ISO 8601 datetime
 - `endDate` (optional): ISO 8601 datetime
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -165,7 +185,7 @@ Authorization: Bearer <token>
       "creator": {
         "id": "uuid",
         "name": "John Doe",
-        "email": "john@example.com"
+        "email": "john"
       }
     }
   ]
@@ -173,16 +193,19 @@ Authorization: Bearer <token>
 ```
 
 #### Create Event
+
 ```http
 POST /api/calendar
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "title": "Family Dinner",
@@ -195,6 +218,7 @@ Authorization: Bearer <token>
 ```
 
 **Validation Rules:**
+
 - `title`: Required, max 200 characters
 - `description`: Optional, max 2000 characters
 - `startDate`: Required, ISO 8601 datetime
@@ -203,6 +227,7 @@ Authorization: Bearer <token>
 - `allDay`: Boolean, default false
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -211,16 +236,19 @@ Authorization: Bearer <token>
 ```
 
 #### Get Event by ID
+
 ```http
 GET /api/calendar/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -229,16 +257,19 @@ Authorization: Bearer <token>
 ```
 
 #### Update Event
+
 ```http
 PUT /api/calendar/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:** (all fields optional)
+
 ```json
 {
   "title": "Updated Title",
@@ -253,6 +284,7 @@ Authorization: Bearer <token>
 **Authorization:** User must be creator or admin
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -261,11 +293,13 @@ Authorization: Bearer <token>
 ```
 
 #### Delete Event
+
 ```http
 DELETE /api/calendar/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -273,6 +307,7 @@ Authorization: Bearer <token>
 **Authorization:** User must be creator or admin
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -285,16 +320,19 @@ Authorization: Bearer <token>
 ### Travel Plans
 
 #### List All Travel Plans
+
 ```http
 GET /api/travel
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -314,7 +352,7 @@ Authorization: Bearer <token>
       "creator": {
         "id": "uuid",
         "name": "John Doe",
-        "email": "john@example.com"
+        "email": "john"
       }
     }
   ]
@@ -322,16 +360,19 @@ Authorization: Bearer <token>
 ```
 
 #### Create Travel Plan
+
 ```http
 POST /api/travel
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "title": "Summer Vacation",
@@ -345,6 +386,7 @@ Authorization: Bearer <token>
 ```
 
 **Validation Rules:**
+
 - `title`: Required, max 200 characters
 - `destination`: Required, max 200 characters
 - `description`: Optional, max 2000 characters
@@ -354,6 +396,7 @@ Authorization: Bearer <token>
 - `budget`: Optional, positive number
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -362,16 +405,19 @@ Authorization: Bearer <token>
 ```
 
 #### Get Travel Plan by ID
+
 ```http
 GET /api/travel/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -380,16 +426,19 @@ Authorization: Bearer <token>
 ```
 
 #### Update Travel Plan
+
 ```http
 PUT /api/travel/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:** (all fields optional)
+
 ```json
 {
   "title": "Updated Title",
@@ -405,6 +454,7 @@ Authorization: Bearer <token>
 **Authorization:** User must be creator or admin
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -413,11 +463,13 @@ Authorization: Bearer <token>
 ```
 
 #### Delete Travel Plan
+
 ```http
 DELETE /api/travel/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -425,6 +477,7 @@ Authorization: Bearer <token>
 **Authorization:** User must be creator or admin
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -437,20 +490,24 @@ Authorization: Bearer <token>
 ### News Entries
 
 #### List All News
+
 ```http
 GET /api/news
 GET /api/news?limit=20
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Query Parameters:**
+
 - `limit` (optional): Number of entries to return (default: 50)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -465,7 +522,7 @@ Authorization: Bearer <token>
       "creator": {
         "id": "uuid",
         "name": "Admin User",
-        "email": "admin@family-hub.com"
+        "email": "admin"
       }
     }
   ]
@@ -473,16 +530,19 @@ Authorization: Bearer <token>
 ```
 
 #### Create News Entry
+
 ```http
 POST /api/news
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "title": "Important Announcement",
@@ -491,10 +551,12 @@ Authorization: Bearer <token>
 ```
 
 **Validation Rules:**
+
 - `title`: Required, max 200 characters
 - `content`: Required, 1-10000 characters
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -503,16 +565,19 @@ Authorization: Bearer <token>
 ```
 
 #### Get News Entry by ID
+
 ```http
 GET /api/news/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -521,16 +586,19 @@ Authorization: Bearer <token>
 ```
 
 #### Update News Entry
+
 ```http
 PUT /api/news/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:** (all fields optional)
+
 ```json
 {
   "title": "Updated Title",
@@ -541,6 +609,7 @@ Authorization: Bearer <token>
 **Authorization:** User must be creator or admin
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -549,11 +618,13 @@ Authorization: Bearer <token>
 ```
 
 #### Delete News Entry
+
 ```http
 DELETE /api/news/:id
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -561,6 +632,7 @@ Authorization: Bearer <token>
 **Authorization:** User must be creator or admin
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -572,18 +644,19 @@ Authorization: Bearer <token>
 
 ## Error Codes
 
-| Code | Description |
-|------|-------------|
-| 400 | Bad Request - Validation error or invalid input |
-| 401 | Unauthorized - Missing or invalid token |
-| 403 | Forbidden - Insufficient permissions |
-| 404 | Not Found - Resource doesn't exist |
-| 409 | Conflict - Resource already exists |
-| 500 | Internal Server Error |
+| Code | Description                                     |
+| ---- | ----------------------------------------------- |
+| 400  | Bad Request - Validation error or invalid input |
+| 401  | Unauthorized - Missing or invalid token         |
+| 403  | Forbidden - Insufficient permissions            |
+| 404  | Not Found - Resource doesn't exist              |
+| 409  | Conflict - Resource already exists              |
+| 500  | Internal Server Error                           |
 
 ## Rate Limiting
 
 Currently no rate limiting is implemented. Consider adding rate limiting for production:
+
 - Login: 5 attempts per 15 minutes
 - Registration: 3 attempts per hour
 - API calls: 100 requests per minute per user
@@ -600,6 +673,7 @@ Currently no rate limiting is implemented. Consider adding rate limiting for pro
 ## Example Usage
 
 ### JavaScript/TypeScript
+
 ```typescript
 // Login
 const response = await fetch('/api/auth/login', {
@@ -608,7 +682,7 @@ const response = await fetch('/api/auth/login', {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    email: 'user@example.com',
+    email: 'username',
     password: 'password123',
   }),
 })
@@ -620,7 +694,7 @@ const event = await fetch('/api/calendar', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
     title: 'Family Dinner',
@@ -631,11 +705,12 @@ const event = await fetch('/api/calendar', {
 ```
 
 ### cURL
+
 ```bash
 # Login
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@family-hub.com","password":"admin123"}'
+  -d '{"email":"admin","password":"admin123"}'
 
 # Create event (replace TOKEN with actual token)
 curl -X POST http://localhost:3000/api/calendar \
@@ -651,4 +726,3 @@ curl -X POST http://localhost:3000/api/calendar \
 ## Support
 
 For API questions or issues, please open an issue on the GitHub repository.
-

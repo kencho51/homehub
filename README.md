@@ -80,9 +80,9 @@ Visit http://localhost:3000
 
 **Test Credentials:**
 
-- **Admin**: admin@family-hub.com / admin123
-- **User 1**: john@family-hub.com / test123
-- **User 2**: jane@family-hub.com / test123
+- **Admin**: admin / admin123
+- **User 1**: john / test123
+- **User 2**: jane / test123
 
 ## 📁 Project Structure
 
@@ -114,7 +114,8 @@ family-hub/
 ├── prisma/           # Prisma schema and migrations
 │   ├── schema.prisma
 │   ├── dev.db       # SQLite database
-│   └── seed.sql     # SQL seed data
+│   ├── seed-dev.sql # Development seed data
+│   └── seed-live.sql# Production seed data (not in git)
 ├── scripts/          # Utility scripts
 │   ├── seed.ts      # Database seeding
 │   └── generate-hashes.ts  # Password hash generator
@@ -214,11 +215,11 @@ Click any event in the calendar grid to quickly edit description and times witho
 
 After running `npm run db:seed`:
 
-| Email                | Password | Role   |
-| -------------------- | -------- | ------ |
-| admin@family-hub.com | admin123 | admin  |
-| john@family-hub.com  | test123  | member |
-| jane@family-hub.com  | test123  | member |
+| Username | Password | Role   |
+| -------- | -------- | ------ |
+| admin    | admin123 | admin  |
+| john     | test123  | member |
+| jane     | test123  | member |
 
 **⚠️ Important**: Change these credentials before deploying to production!
 

@@ -28,6 +28,9 @@ dev.db-journal
 *.db
 *.db-journal
 
+# Production seed data (contains real credentials)
+prisma/seed-live.sql
+
 # Wrangler
 wrangler.toml
 .wrangler

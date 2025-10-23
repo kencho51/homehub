@@ -9,23 +9,11 @@
         <form @submit.prevent="handleRegister" class="space-y-4">
           <div class="space-y-2">
             <Label for="name">Name</Label>
-            <Input
-              id="name"
-              v-model="name"
-              type="text"
-              placeholder="John Doe"
-              required
-            />
+            <Input id="name" v-model="name" type="text" placeholder="John Doe" required />
           </div>
           <div class="space-y-2">
-            <Label for="email">Email</Label>
-            <Input
-              id="email"
-              v-model="email"
-              type="email"
-              placeholder="you@example.com"
-              required
-            />
+            <Label for="email">Username</Label>
+            <Input id="email" v-model="email" type="text" placeholder="username" required />
           </div>
           <div class="space-y-2">
             <Label for="password">Password</Label>
@@ -46,9 +34,7 @@
         </form>
         <div class="mt-4 text-center text-sm">
           Already have an account?
-          <NuxtLink to="/login" class="text-primary hover:underline">
-            Sign in
-          </NuxtLink>
+          <NuxtLink to="/login" class="text-primary hover:underline"> Sign in </NuxtLink>
         </div>
       </CardContent>
     </Card>
@@ -62,7 +48,7 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 
 definePageMeta({
-  layout: false
+  layout: false,
 })
 
 const { register } = useAuth()
@@ -80,7 +66,7 @@ const handleRegister = async () => {
 
   try {
     const result = await register(name.value, email.value, password.value)
-    
+
     if (result.success) {
       router.push('/')
     } else {
@@ -93,4 +79,3 @@ const handleRegister = async () => {
   }
 }
 </script>
-

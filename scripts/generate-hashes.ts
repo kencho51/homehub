@@ -4,9 +4,9 @@ import { webcrypto } from 'node:crypto'
  * Generate password hashes for seed data using Web Crypto API
  *
  * This utility generates password hashes that match the test credentials:
- * - admin@family-hub.com / admin123 (Admin User)
- * - john@family-hub.com / test123 (John Doe)
- * - jane@family-hub.com / test123 (Jane Smith)
+ * - admin / admin123 (Admin User)
+ * - john / test123 (John Doe)
+ * - jane / test123 (Jane Smith)
  *
  * Uses PBKDF2 (Web Crypto API) - compatible with Cloudflare Workers
  *
@@ -55,11 +55,11 @@ async function generateHashes() {
   const admin123 = await hashPassword('admin123')
   const test123 = await hashPassword('test123')
 
-  console.log('Admin User (admin@family-hub.com):')
+  console.log('Admin User (admin):')
   console.log('  Password: admin123')
   console.log('  Hash: ' + admin123)
 
-  console.log('\nTest Users (john@family-hub.com, jane@family-hub.com):')
+  console.log('\nTest Users (john, jane):')
   console.log('  Password: test123')
   console.log('  Hash: ' + test123)
 

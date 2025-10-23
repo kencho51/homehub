@@ -20,15 +20,19 @@ To use D1: `npm run dev:d1`
 
 SQL schema file used to initialize the D1 database structure. This is executed when running `npm run db:push`.
 
-### `seed.sql`
+### `seed-dev.sql`
 
-SQL seed data file containing test users and sample data. This is executed when running `npm run db:seed`.
+SQL seed data file containing test users and sample data for development. This is executed when running `npm run db:seed`.
 
 Test credentials in seed data:
 
-- Admin: admin@family-hub.com / admin123
-- User 1: john@family-hub.com / test123
-- User 2: jane@family-hub.com / test123
+- Admin: admin / admin123
+- User 1: john / test123
+- User 2: jane / test123
+
+### `seed-live.sql`
+
+Production seed data file (not tracked in git for security). Contains real user credentials for production deployment.
 
 ## D1 Database Location
 

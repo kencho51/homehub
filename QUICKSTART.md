@@ -53,7 +53,7 @@ Open http://localhost:3000
 
 Use these test credentials:
 
-- **Email**: `admin@family-hub.com`
+- **Username**: `admin`
 - **Password**: `admin123`
 
 ## 🎉 You're Ready!

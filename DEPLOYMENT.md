@@ -28,7 +28,7 @@ This guide provides instructions for deploying Family Hub to Cloudflare Pages an
    - **Production branch**: `main`
    - **Framework preset**: Nuxt.js
    - **Build command**: `npm run build`
-   - **Build output directory**: `.output/public`
+   - **Build output directory**: `/dist`
    - **Environment variables** (click "Add variable"):
      - `NODE_VERSION` = `18` or `20`
      - `NITRO_PRESET` = `cloudflare-pages`
@@ -51,7 +51,7 @@ After your first deployment:
    - Go to your Pages project in Cloudflare Dashboard
    - Click "Settings" → "Functions"
    - Under "D1 database bindings", click "Add binding"
-   - **Variable name**: `DB`
+   - **Variable name**: `homehubdb`
    - **D1 database**: Select `homehub-db`
    - Click "Save"
 
@@ -64,8 +64,10 @@ After your first deployment:
 4. **Seed Production Database**:
 
    ```bash
-   wrangler d1 execute homehub-db --remote --file=./prisma/seed.sql
+   wrangler d1 execute homehub-db --remote --file=./prisma/seed-live.sql
    ```
+
+   **Note**: Use `seed-live.sql` for production (contains real credentials, not tracked in git) or `seed-dev.sql` for development/testing.
 
 5. **Redeploy** to pick up the D1 binding
 
@@ -88,7 +90,7 @@ The updated `nuxt.config.ts` already handles this by using `process.env.NITRO_PR
 
 1. Visit your deployment URL (e.g., `https://family-hub.pages.dev`)
 2. Login with seeded credentials:
-   - Email: `admin@family-hub.com`
+   - Username: `admin`
    - Password: `admin123`
 3. Test all features:
    - Create calendar event

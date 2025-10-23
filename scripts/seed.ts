@@ -5,9 +5,9 @@ import { webcrypto } from 'node:crypto'
  * Seed script for SQLite/Prisma development
  *
  * Creates test users with consistent credentials:
- * - admin@family-hub.com / admin123 (Admin User)
- * - john@family-hub.com / test123 (John Doe)
- * - jane@family-hub.com / test123 (Jane Smith)
+ * - admin / admin123 (Admin User)
+ * - john / test123 (John Doe)
+ * - jane / test123 (Jane Smith)
  *
  * Uses Web Crypto API (PBKDF2) for password hashing - compatible with Cloudflare Workers
  */
@@ -57,11 +57,11 @@ async function main() {
 
   // Create admin user
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@family-hub.com' },
+    where: { email: 'admin' },
     update: {},
     create: {
       name: 'Admin User',
-      email: 'admin@family-hub.com',
+      email: 'admin',
       password: adminPassword,
       role: 'admin',
     },
@@ -70,11 +70,11 @@ async function main() {
 
   // Create test users
   const testUser1 = await prisma.user.upsert({
-    where: { email: 'john@family-hub.com' },
+    where: { email: 'john' },
     update: {},
     create: {
       name: 'John Doe',
-      email: 'john@family-hub.com',
+      email: 'john',
       password: testPassword,
       role: 'member',
     },
@@ -82,11 +82,11 @@ async function main() {
   console.log('✓ Created test user:', testUser1.email)
 
   const testUser2 = await prisma.user.upsert({
-    where: { email: 'jane@family-hub.com' },
+    where: { email: 'jane' },
     update: {},
     create: {
       name: 'Jane Smith',
-      email: 'jane@family-hub.com',
+      email: 'jane',
       password: testPassword,
       role: 'member',
     },
@@ -151,9 +151,9 @@ async function main() {
 
   console.log('✨ Seeding completed successfully!')
   console.log('\n📝 Test Credentials:')
-  console.log('Admin: admin@family-hub.com / admin123')
-  console.log('User 1: john@family-hub.com / test123')
-  console.log('User 2: jane@family-hub.com / test123')
+  console.log('Admin: admin / admin123')
+  console.log('User 1: john / test123')
+  console.log('User 2: jane / test123')
 }
 
 main()

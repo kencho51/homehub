@@ -4,41 +4,41 @@ import { validateBody, registerSchema } from '~/lib/validation'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  
+
   try {
     // Validate request body
     const data = await validateBody(event, registerSchema)
-    
+
     const db = getDb(event)
-    
-    // Check if user already exists
+
+    // Check if username already exists (stored in email field)
     const existingUser = await db.user.findUnique({
-      where: { email: data.email }
+      where: { email: data.email },
     })
-    
+
     if (existingUser) {
       throw createError({
         statusCode: 409,
-        message: 'User with this email already exists'
+        message: 'Username already exists',
       })
     }
-    
+
     // Hash password
     const hashedPassword = await hashPassword(data.password)
-    
+
     // Create user
     const user = await db.user.create({
       data: {
         name: data.name,
         email: data.email,
         password: hashedPassword,
-        role: 'member'
-      }
+        role: 'member',
+      },
     })
-    
+
     // Generate JWT token
     const token = await generateToken(user.id, user.email, user.role, config.jwtSecret)
-    
+
     return {
       success: true,
       token,
@@ -46,8 +46,8 @@ export default defineEventHandler(async (event) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     }
   } catch (error: any) {
     if (error.statusCode) {
@@ -55,8 +55,7 @@ export default defineEventHandler(async (event) => {
     }
     throw createError({
       statusCode: 500,
-      message: 'Internal server error'
+      message: 'Internal server error',
     })
   }
 })
-

@@ -3,12 +3,12 @@ import { z } from 'zod'
 // User validation schemas
 export const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100),
-  email: z.string().email('Invalid email address'),
+  email: z.string().min(1, 'Username is required').max(100),
   password: z.string().min(6, 'Password must be at least 6 characters').max(100),
 })
 
 export const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().min(1, 'Username is required'),
   password: z.string().min(1, 'Password is required'),
 })
 
@@ -55,10 +55,9 @@ export async function validateBody<T>(event: any, schema: z.ZodSchema<T>): Promi
       throw createError({
         statusCode: 400,
         message: 'Validation error',
-        data: error.errors
+        data: error.errors,
       })
     }
     throw error
   }
 }
-
