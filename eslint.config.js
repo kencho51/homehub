@@ -12,6 +12,13 @@ export default [
         ecmaVersion: 'latest',
         sourceType: 'module',
       },
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': typescript,
@@ -24,13 +31,26 @@ export default [
     },
   },
   {
-    ignores: [
-      'node_modules/**',
-      '.nuxt/**',
-      '.output/**',
-      'dist/**',
-      '.wrangler/**',
-    ],
+    files: ['scripts/**/*.ts'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
+    },
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
+    ignores: ['node_modules/**', '.nuxt/**', '.output/**', 'dist/**', '.wrangler/**'],
   },
 ]
-

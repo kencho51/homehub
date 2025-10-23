@@ -2,7 +2,36 @@
   <div>
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold text-gray-900">Travel Plans</h1>
-      <Button @click="openCreateModal">Add Travel Plan</Button>
+      <div class="flex space-x-2">
+        <Button @click="showGrid = !showGrid" variant="outline">
+          <svg
+            v-if="!showGrid"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
+            />
+          </svg>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          {{ showGrid ? 'Card View' : 'Calendar View' }}
+        </Button>
+        <Button @click="openCreateModal">Add Travel Plan</Button>
+      </div>
     </div>
 
     <div v-if="loading" class="text-center py-12">
@@ -13,6 +42,16 @@
       <p class="text-gray-600">No travel plans yet. Plan your first adventure!</p>
     </div>
 
+    <!-- Calendar Grid View -->
+    <CalendarGrid
+      v-else-if="showGrid"
+      :items="travelPlans"
+      @item-edit="viewPlanDetails"
+      @item-delete="handleGridDelete"
+      @slot-click="handleSlotClick"
+    />
+
+    <!-- Card View -->
     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card v-for="plan in travelPlans" :key="plan.id" class="hover:shadow-lg transition-shadow">
         <CardHeader>
@@ -22,6 +61,9 @@
               <CardDescription>{{ plan.destination }}</CardDescription>
             </div>
             <div class="flex space-x-2">
+              <Button size="sm" variant="outline" @click="exportToCalendar(plan)">
+                📅 Export to Family Calendar
+              </Button>
               <Button size="sm" variant="outline" @click="editPlan(plan)">Edit</Button>
               <Button size="sm" variant="destructive" @click="deletePlan(plan.id)">Delete</Button>
             </div>
@@ -41,7 +83,10 @@
     </div>
 
     <!-- Create/Edit Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
       <Card class="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader>
           <CardTitle>{{ editingPlan ? 'Edit Travel Plan' : 'Create Travel Plan' }}</CardTitle>
@@ -85,7 +130,9 @@
             </div>
             <div v-if="error" class="text-sm text-destructive">{{ error }}</div>
             <div class="flex space-x-2">
-              <Button type="submit" :disabled="submitting">{{ submitting ? 'Saving...' : 'Save' }}</Button>
+              <Button type="submit" :disabled="submitting">{{
+                submitting ? 'Saving...' : 'Save'
+              }}</Button>
               <Button type="button" variant="outline" @click="closeModal">Cancel</Button>
             </div>
           </form>
@@ -100,15 +147,17 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/com
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
+import CalendarGrid from '~/components/CalendarGrid.vue'
 
 definePageMeta({
-  middleware: ['auth']
+  middleware: ['auth'],
 })
 
 const { fetchWithAuth } = useApi()
 const travelPlans = ref<any[]>([])
 const loading = ref(true)
 const showModal = ref(false)
+const showGrid = ref(true)
 const editingPlan = ref<any>(null)
 const error = ref('')
 const submitting = ref(false)
@@ -120,7 +169,7 @@ const form = ref({
   startDate: '',
   endDate: '',
   budget: null as number | null,
-  itinerary: ''
+  itinerary: '',
 })
 
 onMounted(async () => {
@@ -150,7 +199,7 @@ const openCreateModal = () => {
     startDate: '',
     endDate: '',
     budget: null,
-    itinerary: ''
+    itinerary: '',
   }
   showModal.value = true
 }
@@ -164,7 +213,7 @@ const editPlan = (plan: any) => {
     startDate: new Date(plan.startDate).toISOString().slice(0, 16),
     endDate: new Date(plan.endDate).toISOString().slice(0, 16),
     budget: plan.budget || null,
-    itinerary: plan.itinerary || ''
+    itinerary: plan.itinerary || '',
   }
   showModal.value = true
 }
@@ -174,10 +223,8 @@ const handleSubmit = async () => {
   submitting.value = true
 
   try {
-    const url = editingPlan.value
-      ? `/api/travel/${editingPlan.value.id}`
-      : '/api/travel'
-    
+    const url = editingPlan.value ? `/api/travel/${editingPlan.value.id}` : '/api/travel'
+
     const method = editingPlan.value ? 'PUT' : 'POST'
 
     const response = await fetchWithAuth(url, {
@@ -189,8 +236,8 @@ const handleSubmit = async () => {
         startDate: new Date(form.value.startDate).toISOString(),
         endDate: new Date(form.value.endDate).toISOString(),
         budget: form.value.budget || undefined,
-        itinerary: form.value.itinerary || undefined
-      }
+        itinerary: form.value.itinerary || undefined,
+      },
     })
 
     if (response.success) {
@@ -225,8 +272,62 @@ const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
   })
 }
-</script>
 
+const viewPlanDetails = (plan: any) => {
+  editPlan(plan)
+}
+
+const handleGridDelete = (plan: any) => {
+  deletePlan(plan.id)
+}
+
+const handleSlotClick = (slotDate: Date) => {
+  editingPlan.value = null
+  const startDate = new Date(slotDate)
+  const endDate = new Date(slotDate)
+  endDate.setDate(endDate.getDate() + 1) // Default to 1 day duration for travel
+
+  form.value = {
+    title: '',
+    destination: '',
+    description: '',
+    startDate: startDate.toISOString().slice(0, 16),
+    endDate: endDate.toISOString().slice(0, 16),
+    budget: null,
+    itinerary: '',
+  }
+  showModal.value = true
+}
+
+const exportToCalendar = async (plan: any) => {
+  if (
+    !confirm(
+      `Export "${plan.title}" to calendar?\n\nThis will create a calendar event with the same dates and details.`
+    )
+  )
+    return
+
+  try {
+    const response = await fetchWithAuth('/api/calendar', {
+      method: 'POST',
+      body: {
+        title: plan.title,
+        description: `${plan.description || ''}\n\nDestination: ${plan.destination}${plan.budget ? `\nBudget: $${plan.budget}` : ''}`,
+        location: plan.destination,
+        startDate: plan.startDate,
+        endDate: plan.endDate,
+        allDay: true,
+      },
+    })
+
+    if (response.success) {
+      alert('Travel plan exported to calendar successfully!')
+    }
+  } catch (err: any) {
+    alert(err.data?.message || 'Failed to export to Family Calendar')
+  }
+}
+</script>

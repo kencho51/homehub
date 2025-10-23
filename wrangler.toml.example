@@ -9,11 +9,11 @@ pages_build_output_dir = ".output/public"
 
 # D1 Database binding
 [[d1_databases]]
-binding = "DB"
-database_name = "family-hub-db"
+binding = "homehubdb"
+database_name = "homehub-db"
 database_id = "your-database-id-here"  # Replace with your actual D1 database ID
 
-# Environment variables (secrets)
-# Set these using: wrangler secret put <KEY>
-# - JWT_SECRET
-
+# For production deployment (optional - managed by Wrangler)
+CLOUDFLARE_ACCOUNT_ID=""
+CLOUDFLARE_DATABASE_ID=""
+CLOUDFLARE_D1_TOKEN=""

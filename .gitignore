@@ -21,7 +21,6 @@ logs
 # Local env files
 .env
 .env.*
-!.env.example
 
 # Database
 dev.db
@@ -35,3 +34,5 @@ wrangler.toml
 .dev.vars
 
 history.md
+
+package-lock.json

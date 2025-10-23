@@ -1,131 +1,96 @@
-# Quick Start Guide
+# 🚀 Family Hub - Quick Start Guide
 
-Get Family Hub running in 5 minutes!
+Get your Family Hub up and running in 5 minutes!
 
 ## Prerequisites
 
 - Node.js 18+ installed
-- npm installed
-- Terminal/command line access
+- npm package manager
 
-## Installation Steps
+## Setup Steps
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
-### 2. Set Up Database
+### 2. Configure Environment
+
+```bash
+cp env.example .env
+```
+
+Edit `.env`:
+
+```env
+JWT_SECRET=your-super-secret-key-change-this-in-production
+DATABASE_URL="file:./prisma/dev.db"
+```
+
+### 3. Setup Database
+
 ```bash
 # Generate Prisma client
 npm run db:generate
 
-# Create database tables
-npx prisma db push
+# Create database schema
+npm run db:push
 
-# Seed with test data
+# Add test data
 npm run db:seed
 ```
 
-### 3. Start Development Server
+### 4. Start Development Server
+
 ```bash
 npm run dev
 ```
 
-### 4. Open in Browser
-Visit: http://localhost:3000
+Open http://localhost:3000
 
-## Test Credentials
+### 5. Login
 
-Use these credentials to log in:
+Use these test credentials:
 
-**Admin Account:**
-- Email: `admin@family-hub.com`
-- Password: `admin123`
+- **Email**: `admin@family-hub.com`
+- **Password**: `admin123`
 
-**Regular User:**
-- Email: `john@family-hub.com`
-- Password: `test123`
+## 🎉 You're Ready!
 
-## What to Try First
+Explore the features:
 
-1. **Log in** with admin credentials
-2. **Create a calendar event** - Click Calendar → Add Event
-3. **Plan a trip** - Click Travel → Add Travel Plan
-4. **Post news** - Click News → Post News
-5. **Register a new user** - Log out and click Register
+- **Dashboard**: View family calendar and news
+- **Travel Planner**: Create and manage travel plans
+- **News**: Post family updates
+- **Profile**: View your activity and settings
 
 ## Common Commands
 
 ```bash
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
+# Reset database
+npm run db:reset
 
 # Run linting
 npm run lint
 
 # Format code
 npm run format
-
-# Reseed database
-npm run db:seed
-```
-
-## Project Structure
-
-```
-family-hub/
-├── pages/          # Application pages (auto-routed)
-├── components/     # Reusable Vue components
-├── server/api/     # Backend API endpoints
-├── lib/            # Utilities and helpers
-├── prisma/         # Database schema
-└── assets/         # Styles and static files
 ```
 
 ## Need Help?
 
-- Full documentation: See `README.md`
-- API reference: See `API.md`
-- Deployment: See `DEPLOYMENT.md`
+- Check [README.md](./README.md) for full documentation
+- See [API.md](./API.md) for API documentation
+- Review [FEATURES.md](./FEATURES.md) for feature details
 
 ## Next Steps
 
-1. **Customize** the application for your needs
-2. **Deploy** to Cloudflare Pages (see DEPLOYMENT.md)
-3. **Extend** with new features
-
-## Troubleshooting
-
-### Database Issues
-```bash
-# Reset database
-rm dev.db
-npx prisma db push
-npm run db:seed
-```
-
-### Module Errors
-```bash
-# Reinstall dependencies
-rm -rf node_modules
-npm install
-```
-
-### Port Already in Use
-```bash
-# Use different port
-PORT=3001 npm run dev
-```
-
-## Security Note
-
-⚠️ The seeded credentials are for development only. Change them before deploying to production!
+1. Change the default passwords in production
+2. Generate a secure `JWT_SECRET`
+3. Customize the UI to match your family's needs
+4. Deploy to Cloudflare Pages (see [DEPLOYMENT.md](./DEPLOYMENT.md))
 
 ---
 
-Happy coding! 🎉
-
+Happy organizing! 👨‍👩‍👧‍👦

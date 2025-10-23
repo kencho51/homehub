@@ -2,6 +2,8 @@
 
 This guide provides detailed instructions for deploying Family Hub to Cloudflare Pages with D1 database.
 
+> **💡 Local Development**: Before deploying, test with D1 locally! See [D1_LOCAL_DEVELOPMENT.md](./D1_LOCAL_DEVELOPMENT.md)
+
 ## Prerequisites
 
 - Cloudflare account (free tier is sufficient)
@@ -32,12 +34,13 @@ Note your Account ID for later use.
 ### 2.1 Create the Database
 
 ```bash
-wrangler d1 create family-hub-db
+wrangler d1 create homehub-db
 ```
 
 This will output something like:
+
 ```
-✅ Successfully created DB 'family-hub-db'!
+✅ Successfully created DB 'homehub-db'!
 database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
 
@@ -45,7 +48,8 @@ database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
 ### 2.2 Update Configuration
 
-1. Copy the example wrangler config:
+1. Copy the example wrangler config (if not using local D1):
+
    ```bash
    cp wrangler.toml.example wrangler.toml
    ```
@@ -53,8 +57,8 @@ database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 2. Edit `wrangler.toml` and replace `your-database-id-here` with your actual database ID:
    ```toml
    [[d1_databases]]
-   binding = "DB"
-   database_name = "family-hub-db"
+   binding = "homehubdb"
+   database_name = "homehub-db"
    database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
    ```
 
@@ -63,12 +67,13 @@ database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 Execute the migration on your remote D1 database:
 
 ```bash
-wrangler d1 execute family-hub-db --remote --file=./prisma/migrations/schema.sql
+wrangler d1 execute homehub-db --remote --file=./prisma/migrations/schema.sql
 ```
 
 Verify the schema was created:
+
 ```bash
-wrangler d1 execute family-hub-db --remote --command="SELECT name FROM sqlite_master WHERE type='table';"
+wrangler d1 execute homehub-db --remote --command="SELECT name FROM sqlite_master WHERE type='table';"
 ```
 
 ## Step 3: Build and Test Locally
@@ -151,8 +156,8 @@ After the first deployment, you need to bind the D1 database:
 3. Scroll to "Functions" section
 4. Click "D1 database bindings"
 5. Click "Add binding"
-   - **Variable name**: `DB`
-   - **D1 database**: Select `family-hub-db`
+   - **Variable name**: `homehubdb`
+   - **D1 database**: Select `homehub-db`
 6. Click "Save"
 
 ### Via Wrangler (if deploying via CLI):
@@ -180,6 +185,7 @@ VALUES (
 ```
 
 **Note**: Generate bcrypt hashes locally first:
+
 ```bash
 node -e "const bcrypt = require('bcrypt'); bcrypt.hash('admin123', 10).then(console.log)"
 ```
@@ -187,7 +193,7 @@ node -e "const bcrypt = require('bcrypt'); bcrypt.hash('admin123', 10).then(cons
 ### 6.2 Execute Seed
 
 ```bash
-wrangler d1 execute family-hub-db --remote --file=./seed-remote.sql
+wrangler d1 execute homehub-db --remote --file=./seed-remote.sql
 ```
 
 Alternatively, use the Cloudflare Dashboard SQL editor in the D1 section.
@@ -230,28 +236,30 @@ Before going live:
 
 ### Production Environment Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `JWT_SECRET` | Secret for JWT signing | `your-random-secret-string` |
-| `NODE_VERSION` | Node.js version | `18` or `20` |
+| Variable       | Description            | Example                     |
+| -------------- | ---------------------- | --------------------------- |
+| `JWT_SECRET`   | Secret for JWT signing | `your-random-secret-string` |
+| `NODE_VERSION` | Node.js version        | `18` or `20`                |
 
 ### D1 Binding
 
-| Variable | Value |
-|----------|-------|
-| `DB` | Binding to `family-hub-db` |
+| Variable    | Value                   |
+| ----------- | ----------------------- |
+| `homehubdb` | Binding to `homehub-db` |
 
 ## Troubleshooting
 
 ### Build Fails
 
 **Issue**: Build fails with module not found errors
-**Solution**: 
+**Solution**:
+
 - Ensure all dependencies are in `dependencies`, not `devDependencies`
 - Clear build cache and redeploy
 
 **Issue**: TypeScript errors during build
 **Solution**:
+
 - Run `npm run build` locally first to catch errors
 - Fix type issues before deploying
 
@@ -259,12 +267,14 @@ Before going live:
 
 **Issue**: Cannot connect to D1 database
 **Solution**:
+
 - Verify D1 binding is configured in Pages settings
-- Check binding name matches `DB` in code
+- Check binding name matches `homehubdb` in code
 - Ensure database exists and has tables
 
 **Issue**: Database queries return empty results
 **Solution**:
+
 - Verify migrations ran successfully
 - Check data was seeded correctly
 - Use Cloudflare Dashboard D1 SQL editor to inspect data
@@ -273,12 +283,14 @@ Before going live:
 
 **Issue**: Login fails with 401 errors
 **Solution**:
+
 - Verify `JWT_SECRET` is set in environment variables
 - Check user exists in database with correct password hash
 - Clear browser cookies and try again
 
 **Issue**: Token expired errors
 **Solution**:
+
 - JWT tokens expire after 7 days by default
 - Users need to log in again
 - Consider implementing refresh tokens for longer sessions
@@ -287,6 +299,7 @@ Before going live:
 
 **Issue**: Deployment hangs or takes >10 minutes
 **Solution**:
+
 - Check build logs for errors
 - Ensure `node_modules` is in `.gitignore`
 - Verify build command is correct
@@ -301,7 +314,7 @@ Before going live:
 wrangler pages deployment tail --project-name=family-hub
 
 # View D1 database metrics
-# Go to Cloudflare Dashboard > D1 > family-hub-db > Metrics
+# Go to Cloudflare Dashboard > D1 > homehub-db > Metrics
 ```
 
 ### Update Application
@@ -318,25 +331,26 @@ For schema changes:
 1. Update `prisma/schema.prisma`
 2. Generate migration: `npx prisma migrate dev --name migration_name`
 3. Create SQL file from migration
-4. Execute on remote: `wrangler d1 execute family-hub-db --remote --file=migration.sql`
+4. Execute on remote: `wrangler d1 execute homehub-db --remote --file=migration.sql`
 
 ### Backup Database
 
 ```bash
 # Export database (creates backup.sql)
-wrangler d1 export family-hub-db --remote --output=backup.sql
+wrangler d1 export homehub-db --remote --output=backup.sql
 ```
 
 ### Restore Database
 
 ```bash
 # Import from backup
-wrangler d1 execute family-hub-db --remote --file=backup.sql
+wrangler d1 execute homehub-db --remote --file=backup.sql
 ```
 
 ## Cost Estimation
 
 Cloudflare's free tier includes:
+
 - **Pages**: Unlimited requests, 500 builds/month
 - **D1**: 5 GB storage, 5M reads/day, 100K writes/day
 - **Workers**: 100K requests/day
@@ -362,4 +376,3 @@ For a small family (5-10 users), the free tier should be sufficient.
 ---
 
 Need help? Open an issue on the GitHub repository.
-

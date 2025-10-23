@@ -14,9 +14,9 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,ts,vue,json,md}\"",
     "db:generate": "prisma generate",
-    "db:push": "wrangler d1 execute family-hub-db --local --file=./prisma/migrations/schema.sql",
+    "db:push": "prisma db push",
     "db:seed": "tsx scripts/seed.ts",
-    "wrangler:dev": "wrangler pages dev --compatibility-date=2024-01-01 .output/public",
+    "db:reset": "rm -f prisma/dev.db && npm run db:push && npm run db:seed",
     "deploy": "npm run build && wrangler pages deploy .output/public"
   },
   "dependencies": {
@@ -48,7 +48,6 @@
     "prisma": "^5.22.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "wrangler": "^3.90.0"
+    "wrangler": "^4.44.0"
   }
 }
-

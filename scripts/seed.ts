@@ -1,12 +1,26 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
+/**
+ * Seed script for SQLite/Prisma development
+ *
+ * Creates test users with consistent credentials:
+ * - admin@family-hub.com / admin123 (Admin User)
+ * - john@family-hub.com / test123 (John Doe)
+ * - jane@family-hub.com / test123 (Jane Smith)
+ *
+ * For D1 database, use: npm run db:seed (runs prisma/seed.sql)
+ * For SQLite file, use: npm run tsx scripts/seed.ts
+ *
+ * Both approaches create the SAME test users with SAME credentials.
+ */
+
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Starting database seeding...')
 
-  // Hash passwords
+  // Hash passwords (matches credentials in prisma/seed.sql)
   const adminPassword = await bcrypt.hash('admin123', 10)
   const testPassword = await bcrypt.hash('test123', 10)
 
@@ -18,8 +32,8 @@ async function main() {
       name: 'Admin User',
       email: 'admin@family-hub.com',
       password: adminPassword,
-      role: 'admin'
-    }
+      role: 'admin',
+    },
   })
   console.log('✓ Created admin user:', admin.email)
 
@@ -31,8 +45,8 @@ async function main() {
       name: 'John Doe',
       email: 'john@family-hub.com',
       password: testPassword,
-      role: 'member'
-    }
+      role: 'member',
+    },
   })
   console.log('✓ Created test user:', testUser1.email)
 
@@ -43,8 +57,8 @@ async function main() {
       name: 'Jane Smith',
       email: 'jane@family-hub.com',
       password: testPassword,
-      role: 'member'
-    }
+      role: 'member',
+    },
   })
   console.log('✓ Created test user:', testUser2.email)
 
@@ -52,7 +66,7 @@ async function main() {
   const today = new Date()
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
-  
+
   const nextWeek = new Date(today)
   nextWeek.setDate(nextWeek.getDate() + 7)
 
@@ -64,8 +78,8 @@ async function main() {
       endDate: new Date(tomorrow.getTime() + 2 * 60 * 60 * 1000), // 2 hours later
       location: 'Home',
       allDay: false,
-      createdBy: admin.id
-    }
+      createdBy: admin.id,
+    },
   })
   console.log('✓ Created sample calendar event')
 
@@ -85,11 +99,11 @@ async function main() {
       itinerary: JSON.stringify([
         { day: 1, activity: 'Arrival and check-in' },
         { day: 2, activity: 'Beach day' },
-        { day: 3, activity: 'City tour' }
+        { day: 3, activity: 'City tour' },
       ]),
       budget: 5000,
-      createdBy: testUser1.id
-    }
+      createdBy: testUser1.id,
+    },
   })
   console.log('✓ Created sample travel plan')
 
@@ -97,9 +111,10 @@ async function main() {
   await prisma.newsEntry.create({
     data: {
       title: 'Welcome to Family Hub!',
-      content: 'We are excited to launch our new family hub application. Stay connected with calendar events, travel plans, and family news all in one place!',
-      createdBy: admin.id
-    }
+      content:
+        'We are excited to launch our new family hub application. Stay connected with calendar events, travel plans, and family news all in one place!',
+      createdBy: admin.id,
+    },
   })
   console.log('✓ Created sample news entry')
 
@@ -118,4 +133,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect()
   })
-
