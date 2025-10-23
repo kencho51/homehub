@@ -43,7 +43,7 @@ All responses follow this format:
 
 ## Endpoints
 
-### Authentication
+### Authentication & User Management
 
 #### Register User
 
@@ -140,6 +140,192 @@ Authorization: Bearer <token>
     "role": "member",
     "createdAt": "2024-01-01T00:00:00.000Z"
   }
+}
+```
+
+### User Management (Admin Only)
+
+#### List All Users
+
+```http
+GET /api/users
+```
+
+**Headers:**
+
+```
+Authorization: Bearer <token>
+```
+
+**Authorization:** Admin role required
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "users": [
+    {
+      "id": "uuid",
+      "name": "Ken",
+      "email": "ken",
+      "role": "admin",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+#### Get User by ID
+
+```http
+GET /api/users/:id
+```
+
+**Headers:**
+
+```
+Authorization: Bearer <token>
+```
+
+**Authorization:** Admin role required
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "user": {
+    "id": "uuid",
+    "name": "Ken",
+    "email": "ken",
+    "role": "admin",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "_count": {
+      "calendarEvents": 5,
+      "travelPlans": 3,
+      "newsEntries": 2
+    }
+  }
+}
+```
+
+#### Create User
+
+```http
+POST /api/users
+```
+
+**Headers:**
+
+```
+Authorization: Bearer <token>
+```
+
+**Authorization:** Admin role required
+
+**Request Body:**
+
+```json
+{
+  "name": "New User",
+  "email": "newuser",
+  "password": "password123",
+  "role": "member"
+}
+```
+
+**Validation Rules:**
+
+- `name`: 2-100 characters
+- `email`: 1-100 characters (username)
+- `password`: 6-100 characters
+- `role`: "admin" or "member" (default: "member")
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "user": {
+    "id": "uuid",
+    "name": "New User",
+    "email": "newuser",
+    "role": "member",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+#### Update User
+
+```http
+PUT /api/users/:id
+```
+
+**Headers:**
+
+```
+Authorization: Bearer <token>
+```
+
+**Authorization:** Admin role required
+
+**Request Body:** (all fields optional)
+
+```json
+{
+  "name": "Updated Name",
+  "email": "updatedusername",
+  "password": "newpassword123",
+  "role": "admin"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "user": {
+    "id": "uuid",
+    "name": "Updated Name",
+    "email": "updatedusername",
+    "role": "admin",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T12:00:00.000Z"
+  }
+}
+```
+
+#### Delete User
+
+```http
+DELETE /api/users/:id
+```
+
+**Headers:**
+
+```
+Authorization: Bearer <token>
+```
+
+**Authorization:** Admin role required
+
+**Notes:**
+
+- Cannot delete your own account
+- Deletes all related records (cascade)
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "User deleted successfully"
 }
 ```
 

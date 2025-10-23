@@ -1,41 +1,47 @@
 import { getDb } from '~/lib/db'
-import { requireAuth } from '~/lib/auth'
+import { requireAdmin } from '~/lib/auth'
 
 export default defineEventHandler(async (event) => {
   try {
-    const user = await requireAuth(event)
+    const currentUser = await requireAdmin(event)
     const db = getDb(event)
     const id = getRouterParam(event, 'id')
 
     if (!id) {
       throw createError({
         statusCode: 400,
-        message: 'Travel plan ID is required',
+        message: 'User ID is required',
       })
     }
 
-    // Check if travel plan exists
-    const existingPlan = await db.travelPlan.findUnique({
+    // Prevent self-deletion
+    if (id === currentUser.userId) {
+      throw createError({
+        statusCode: 400,
+        message: 'Cannot delete your own account',
+      })
+    }
+
+    // Check if user exists
+    const existingUser = await db.user.findUnique({
       where: { id },
     })
 
-    if (!existingPlan) {
+    if (!existingUser) {
       throw createError({
         statusCode: 404,
-        message: 'Travel plan not found',
+        message: 'User not found',
       })
     }
 
-    // All authenticated users can delete travel plans (collaborative editing)
-
-    // Delete travel plan
-    await db.travelPlan.delete({
+    // Delete user (cascade will delete related records)
+    await db.user.delete({
       where: { id },
     })
 
     return {
       success: true,
-      message: 'Travel plan deleted successfully',
+      message: 'User deleted successfully',
     }
   } catch (error: any) {
     if (error.statusCode) {

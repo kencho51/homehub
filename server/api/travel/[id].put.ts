@@ -7,36 +7,30 @@ export default defineEventHandler(async (event) => {
     const user = await requireAuth(event)
     const db = getDb(event)
     const id = getRouterParam(event, 'id')
-    
+
     if (!id) {
       throw createError({
         statusCode: 400,
-        message: 'Travel plan ID is required'
+        message: 'Travel plan ID is required',
       })
     }
-    
+
     // Check if travel plan exists
     const existingPlan = await db.travelPlan.findUnique({
-      where: { id }
+      where: { id },
     })
-    
+
     if (!existingPlan) {
       throw createError({
         statusCode: 404,
-        message: 'Travel plan not found'
+        message: 'Travel plan not found',
       })
     }
-    
-    // Check if user is the creator or admin
-    if (existingPlan.createdBy !== user.userId && user.role !== 'admin') {
-      throw createError({
-        statusCode: 403,
-        message: 'Forbidden: You can only update your own travel plans'
-      })
-    }
-    
+
+    // All authenticated users can edit travel plans (collaborative editing)
+
     const data = await validateBody(event, updateTravelPlanSchema)
-    
+
     // Update travel plan
     const updatedPlan = await db.travelPlan.update({
       where: { id },
@@ -54,15 +48,15 @@ export default defineEventHandler(async (event) => {
           select: {
             id: true,
             name: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     })
-    
+
     return {
       success: true,
-      travelPlan: updatedPlan
+      travelPlan: updatedPlan,
     }
   } catch (error: any) {
     if (error.statusCode) {
@@ -70,8 +64,7 @@ export default defineEventHandler(async (event) => {
     }
     throw createError({
       statusCode: 500,
-      message: 'Internal server error'
+      message: 'Internal server error',
     })
   }
 })
-

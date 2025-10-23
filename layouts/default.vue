@@ -27,6 +27,14 @@
               >
                 News
               </NuxtLink>
+              <NuxtLink
+                v-if="user?.role === 'admin'"
+                to="/users"
+                class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+                active-class="text-primary bg-primary/10"
+              >
+                Users
+              </NuxtLink>
             </div>
           </div>
           <div class="flex items-center space-x-4">

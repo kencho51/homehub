@@ -4,11 +4,12 @@ A modern, full-stack family management application built with Nuxt 4, Vue 3, and
 
 ## 🌟 Features
 
-- **🔐 Authentication System**: Secure user registration and login with JWT tokens and bcrypt password hashing
+- **🔐 Authentication System**: Secure user registration and login with JWT tokens and password hashing
+- **👥 User Management**: Admin users can create, edit, and delete family members
 - **📅 Family Calendar**: Create, view, and manage family events with day/week/month grid views
-- **✈️ Travel Planner**: Plan trips with detailed itineraries, budgets, and export to calendar
+- **✈️ Travel Planner**: Collaborative trip planning - all family members can edit any travel plan
 - **📰 Family News**: Post and view family updates and announcements
-- **👥 User Profiles**: View activity stats and manage account settings
+- **👤 User Profiles**: View activity stats and manage account settings
 - **🎨 Modern UI**: Beautiful interface using shadcn/ui components with Tailwind CSS
 - **📱 Responsive Design**: Works seamlessly on desktop and mobile devices
 
@@ -129,6 +130,14 @@ family-hub/
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
 - `GET /api/auth/me` - Get current user
+
+### User Management (Admin Only)
+
+- `GET /api/users` - List all users
+- `POST /api/users` - Create new user
+- `GET /api/users/:id` - Get user details
+- `PUT /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user
 
 ### Calendar Events
 
@@ -260,6 +269,11 @@ npm install
 ## 🌐 Deployment
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions for Cloudflare Pages and other platforms.
+
+**Production Database Management:**
+
+- Reset production database: See [PRODUCTION_RESET_GUIDE.md](./PRODUCTION_RESET_GUIDE.md)
+- Quick reset: `./scripts/reset-production.sh` (with backup included)
 
 ## 📝 License
 

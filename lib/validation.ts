@@ -12,6 +12,20 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 })
 
+export const createUserSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100),
+  email: z.string().min(1, 'Username is required').max(100),
+  password: z.string().min(6, 'Password must be at least 6 characters').max(100),
+  role: z.enum(['admin', 'member']).default('member'),
+})
+
+export const updateUserSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100).optional(),
+  email: z.string().min(1, 'Username is required').max(100).optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters').max(100).optional(),
+  role: z.enum(['admin', 'member']).optional(),
+})
+
 // Calendar event validation schemas
 export const calendarEventSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
