@@ -24,15 +24,17 @@ export function getPrismaClient(d1Database?: any) {
 // Helper to get DB from Nuxt event (Cloudflare context)
 export function getDb(event: H3Event): PrismaClient {
   // Try to get D1 database from Cloudflare context
-  // This works both in production (Cloudflare Pages) and local dev (wrangler pages dev)
+  // This works in production (Cloudflare Pages) and optionally in local dev (wrangler pages dev)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d1 = (event.context as any).cloudflare?.env?.homehubdb
 
-  if (!d1) {
-    console.warn('D1 database binding not found. Using fallback SQLite connection.')
-
-    console.warn('Make sure to run: npm run dev:d1 or wrangler pages dev')
+  if (d1) {
+    // Production or advanced local dev with D1
+    console.log('✅ Using D1 database (production mode)')
+    console.log('📁 Database location: .wrangler/state/v3/d1/')
   }
+  // For local development, use simple SQLite file (default)
+  // No warning needed - this is the expected behavior for local dev
 
   return getPrismaClient(d1)
 }

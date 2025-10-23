@@ -34,11 +34,8 @@ DATABASE_URL="file:./prisma/dev.db"
 # Generate Prisma client
 npm run db:generate
 
-# Create database schema
-npm run db:push
-
-# Add test data
-npm run db:seed
+# Initialize and seed database
+npm run db:reset
 ```
 
 ### 4. Start Development Server
@@ -80,9 +77,10 @@ npm run format
 
 ## Need Help?
 
-- Check [README.md](./README.md) for full documentation
-- See [API.md](./API.md) for API documentation
-- Review [FEATURES.md](./FEATURES.md) for feature details
+- Local development guide: [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md)
+- Full documentation: [README.md](./README.md)
+- API reference: [API.md](./API.md)
+- Feature details: [FEATURES.md](./FEATURES.md)
 
 ## Next Steps
 

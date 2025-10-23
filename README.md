@@ -52,22 +52,11 @@ DATABASE_URL="file:./prisma/dev.db"
 
 ### 3. Set Up Database
 
-Generate Prisma client:
+Generate Prisma client and initialize database:
 
 ```bash
 npm run db:generate
-```
-
-Initialize the database schema:
-
-```bash
-npm run db:push
-```
-
-Seed with test data:
-
-```bash
-npm run db:seed
+npm run db:reset
 ```
 
 ### 4. Run Development Server
@@ -77,6 +66,8 @@ npm run dev
 ```
 
 Visit http://localhost:3000
+
+**Note:** Local development uses SQLite (`prisma/dev.db`). Simple and fast! See [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md) for details.
 
 **Test Credentials:**
 
@@ -173,11 +164,17 @@ npm run dev              # Start development server
 npm run build            # Build for production
 npm run preview          # Preview production build
 
-# Database
+# Database (Local Development)
 npm run db:generate      # Generate Prisma client
 npm run db:push          # Push schema to database
 npm run db:seed          # Seed database with test data
 npm run db:reset         # Reset database (delete + push + seed)
+
+# Advanced: D1 Local Testing (Optional)
+npm run dev:d1           # Start with D1 database locally
+npm run db:push:d1       # Push schema to D1 local database
+npm run db:seed:d1       # Seed D1 local database
+npm run db:reset:d1      # Reset D1 local database
 
 # Code Quality
 npm run lint             # Run ESLint
@@ -236,14 +233,11 @@ After running `npm run db:seed`:
 
 ### Database Issues
 
-```bash
-# Reset the database completely
-npm run db:reset
+If you're seeing old data or login doesn't work:
 
-# Or manually:
-rm -f prisma/dev.db
-npm run db:push
-npm run db:seed
+```bash
+# Reset local database
+npm run db:reset
 ```
 
 ### Authentication Not Working

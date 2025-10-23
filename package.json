@@ -7,6 +7,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "dev:d1": "wrangler pages dev --compatibility-date=2024-01-01 --d1=homehubdb --port=3000 -- npm run dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -15,8 +16,11 @@
     "format": "prettier --write \"**/*.{js,ts,vue,json,md}\"",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
+    "db:push:d1": "wrangler d1 execute homehub-db --local --file=./prisma/migrations/schema.sql",
     "db:seed": "tsx scripts/seed.ts",
+    "db:seed:d1": "wrangler d1 execute homehub-db --local --file=./prisma/seed-dev.sql",
     "db:reset": "rm -f prisma/dev.db && npm run db:push && npm run db:seed",
+    "db:reset:d1": "rm -rf .wrangler/state/v3/d1 && npm run db:push:d1 && npm run db:seed:d1",
     "deploy": "npm run build && wrangler pages deploy .output/public"
   },
   "dependencies": {
