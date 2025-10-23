@@ -28,12 +28,21 @@ export default defineNuxtConfig({
     },
   },
 
-  // nitro: {
-  //   preset: 'cloudflare-pages',
-  //   experimental: {
-  //     wasm: true,
-  //   },
-  // },
+  nitro: {
+    preset: process.env.NITRO_PRESET || 'node-server',
+    compatibilityDate: '2024-11-01',
+    experimental: {
+      wasm: true,
+    },
+  },
+
+  vite: {
+    build: {
+      rollupOptions: {
+        external: ['crypto'],
+      },
+    },
+  },
 
   typescript: {
     strict: true,
