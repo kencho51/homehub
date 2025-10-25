@@ -29,13 +29,13 @@ export const updateUserSchema = z.object({
 // Calendar event validation schemas
 export const calendarEventSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
-  description: z.string().max(2000).optional(),
+  description: z.string().max(2000).optional().nullable(),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
-  location: z.string().max(200).optional(),
-  allDay: z.boolean().default(false),
-  isRecurring: z.boolean().default(false),
-  recurrencePattern: z.string().optional(),
+  location: z.string().max(200).optional().nullable(),
+  allDay: z.boolean().optional().default(false),
+  isRecurring: z.boolean().optional().default(false),
+  recurrencePattern: z.string().optional().nullable(),
 })
 
 export const updateCalendarEventSchema = calendarEventSchema.partial()

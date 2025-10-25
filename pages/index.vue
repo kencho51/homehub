@@ -52,13 +52,9 @@
         <p class="text-gray-600">Loading...</p>
       </div>
 
-      <div v-else-if="events.length === 0" class="text-center py-12">
-        <p class="text-gray-600">No events yet. Create your first event!</p>
-      </div>
-
       <CalendarGrid
         v-else
-        :items="events"
+        :items="expandedEvents"
         @item-edit="handleCalendarQuickEdit"
         @item-delete="handleCalendarDelete"
         @slot-click="handleCalendarSlotClick"
@@ -399,6 +395,7 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import CalendarGrid from '~/components/CalendarGrid.vue'
+import { expandRecurringEvents, getCalendarRange } from '~/lib/recurrence'
 
 definePageMeta({
   middleware: ['auth'],
@@ -414,6 +411,16 @@ const events = ref<any[]>([])
 const loadingEvents = ref(true)
 const showCalendarModal = ref(false)
 const showCalendarQuickEdit = ref(false)
+
+// Computed property to expand recurring events into individual occurrences
+const expandedEvents = computed(() => {
+  // Get a reasonable date range for the current view
+  const now = new Date()
+  const range = getCalendarRange(now, 'month') // Default to month view range
+
+  // Expand recurring events
+  return expandRecurringEvents(events.value, range.start, range.end)
+})
 const editingEvent = ref<any>(null)
 const quickEditingEvent = ref<any>(null)
 const calendarError = ref('')
@@ -553,10 +560,10 @@ const handleCalendarSubmit = async () => {
       ? JSON.stringify({
           daysOfWeek: calendarForm.value.recurrence.daysOfWeek,
           endType: calendarForm.value.recurrence.endType,
-          endDate: calendarForm.value.recurrence.endDate || undefined,
+          endDate: calendarForm.value.recurrence.endDate || null,
           endAfterOccurrences: calendarForm.value.recurrence.endAfterOccurrences,
         })
-      : undefined
+      : null
 
     const url = editingEvent.value ? `/api/calendar/${editingEvent.value.id}` : '/api/calendar'
     const method = editingEvent.value ? 'PUT' : 'POST'
@@ -565,8 +572,8 @@ const handleCalendarSubmit = async () => {
       method,
       body: {
         title: calendarForm.value.title,
-        description: calendarForm.value.description || undefined,
-        location: calendarForm.value.location || undefined,
+        description: calendarForm.value.description || null,
+        location: calendarForm.value.location || null,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
         allDay: calendarForm.value.allDay,
@@ -587,10 +594,19 @@ const handleCalendarSubmit = async () => {
 }
 
 const handleCalendarDelete = async (event: any) => {
-  if (!confirm('Are you sure you want to delete this event?')) return
+  // Check if this is a recurring event instance
+  const isRecurringInstance = event._isRecurrenceInstance
+  const eventIdToDelete = isRecurringInstance ? event._baseEventId : event.id
+
+  // Customize confirmation message for recurring events
+  const confirmMessage = isRecurringInstance
+    ? 'This is a recurring event. Deleting it will remove all occurrences. Are you sure?'
+    : 'Are you sure you want to delete this event?'
+
+  if (!confirm(confirmMessage)) return
 
   try {
-    await fetchWithAuth(`/api/calendar/${event.id}`, { method: 'DELETE' })
+    await fetchWithAuth(`/api/calendar/${eventIdToDelete}`, { method: 'DELETE' })
     await fetchEvents()
   } catch (err) {
     console.error('Failed to delete event:', err)
@@ -631,6 +647,21 @@ const handleCalendarSlotClick = (slotDate: Date) => {
 }
 
 const handleCalendarQuickEdit = (event: any) => {
+  // If this is a recurring event instance, warn the user
+  if (event._isRecurrenceInstance) {
+    const shouldProceed = confirm(
+      'This is a recurring event. Editing it will change all occurrences. Do you want to continue?'
+    )
+    if (!shouldProceed) return
+
+    // Find and edit the base event instead
+    const baseEvent = events.value.find((e) => e.id === event._baseEventId)
+    if (baseEvent) {
+      editCalendarEvent(baseEvent)
+      return
+    }
+  }
+
   quickEditingEvent.value = event
   calendarQuickEditForm.value = {
     description: event.description || '',

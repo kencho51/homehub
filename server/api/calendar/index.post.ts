@@ -18,8 +18,8 @@ export default defineEventHandler(async (event) => {
         endDate: new Date(data.endDate),
         location: data.location,
         allDay: data.allDay,
-        isRecurring: data.isRecurring,
-        recurrencePattern: data.recurrencePattern,
+        isRecurring: data.isRecurring || false,
+        recurrencePattern: data.recurrencePattern || null,
         createdBy: user.userId,
       },
       include: {
@@ -41,9 +41,11 @@ export default defineEventHandler(async (event) => {
     if (error.statusCode) {
       throw error
     }
+    console.error('Error creating calendar event:', error)
     throw createError({
       statusCode: 500,
       message: 'Internal server error',
+      data: { error: error.message },
     })
   }
 })

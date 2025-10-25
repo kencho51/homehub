@@ -42,13 +42,15 @@ export default defineEventHandler(async (event) => {
       where: { id },
       data: {
         ...(data.title && { title: data.title }),
-        ...(data.description !== undefined && { description: data.description }),
+        ...(data.description !== undefined && { description: data.description || null }),
         ...(data.startDate && { startDate: new Date(data.startDate) }),
         ...(data.endDate && { endDate: new Date(data.endDate) }),
-        ...(data.location !== undefined && { location: data.location }),
+        ...(data.location !== undefined && { location: data.location || null }),
         ...(data.allDay !== undefined && { allDay: data.allDay }),
         ...(data.isRecurring !== undefined && { isRecurring: data.isRecurring }),
-        ...(data.recurrencePattern !== undefined && { recurrencePattern: data.recurrencePattern }),
+        ...(data.recurrencePattern !== undefined && {
+          recurrencePattern: data.recurrencePattern || null,
+        }),
       },
       include: {
         creator: {
@@ -69,9 +71,11 @@ export default defineEventHandler(async (event) => {
     if (error.statusCode) {
       throw error
     }
+    console.error('Error updating calendar event:', error)
     throw createError({
       statusCode: 500,
       message: 'Internal server error',
+      data: { error: error.message },
     })
   }
 })
