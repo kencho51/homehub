@@ -24,16 +24,18 @@ model User {
 }
 
 model CalendarEvent {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  location    String?
-  allDay      Boolean  @default(false)
-  createdBy   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String   @id @default(uuid())
+  title             String
+  description       String?
+  startDate         DateTime
+  endDate           DateTime
+  location          String?
+  allDay            Boolean  @default(false)
+  isRecurring       Boolean  @default(false)
+  recurrencePattern String?  // JSON string: { frequency, daysOfWeek, endType, endDate, endAfterOccurrences }
+  createdBy         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 

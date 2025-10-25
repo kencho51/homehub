@@ -108,9 +108,9 @@
     <!-- Calendar Event Modal -->
     <div
       v-if="showCalendarModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto"
     >
-      <Card class="w-full max-w-lg">
+      <Card class="w-full max-w-2xl my-8">
         <CardHeader>
           <CardTitle>{{ editingEvent ? 'Edit Event' : 'Create Event' }}</CardTitle>
         </CardHeader>
@@ -128,26 +128,166 @@
               <Label for="event-location">Location</Label>
               <Input id="event-location" v-model="calendarForm.location" />
             </div>
-            <div class="grid grid-cols-2 gap-4">
+
+            <!-- All Day Toggle -->
+            <div class="flex items-center space-x-2">
+              <input
+                id="event-allday"
+                type="checkbox"
+                v-model="calendarForm.allDay"
+                class="h-4 w-4 rounded border-gray-300"
+              />
+              <Label for="event-allday" class="!mt-0 cursor-pointer">All Day Event</Label>
+            </div>
+
+            <!-- Date and Time Fields -->
+            <div v-if="!calendarForm.allDay" class="grid grid-cols-2 gap-4">
               <div class="space-y-2">
-                <Label for="event-start">Start Date</Label>
+                <Label for="event-start-date">Start Date</Label>
                 <Input
-                  id="event-start"
+                  id="event-start-date"
                   v-model="calendarForm.startDate"
-                  type="datetime-local"
+                  type="date"
                   required
                 />
               </div>
               <div class="space-y-2">
-                <Label for="event-end">End Date</Label>
+                <Label for="event-start-time">Start Time</Label>
                 <Input
-                  id="event-end"
-                  v-model="calendarForm.endDate"
-                  type="datetime-local"
+                  id="event-start-time"
+                  v-model="calendarForm.startTime"
+                  type="time"
                   required
                 />
               </div>
             </div>
+
+            <div v-if="calendarForm.allDay" class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <Label for="event-start-date-allday">Start Date</Label>
+                <Input
+                  id="event-start-date-allday"
+                  v-model="calendarForm.startDate"
+                  type="date"
+                  required
+                />
+              </div>
+              <div class="space-y-2">
+                <Label for="event-end-date-allday">End Date</Label>
+                <Input
+                  id="event-end-date-allday"
+                  v-model="calendarForm.endDate"
+                  type="date"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Duration (for non-all-day events) -->
+            <div v-if="!calendarForm.allDay" class="space-y-2">
+              <Label for="event-duration">Duration (hours)</Label>
+              <Input
+                id="event-duration"
+                v-model.number="calendarForm.duration"
+                type="number"
+                min="0.5"
+                step="0.5"
+                required
+              />
+            </div>
+
+            <!-- Recurrence Section -->
+            <div class="border-t pt-4 space-y-4">
+              <div class="flex items-center space-x-2">
+                <input
+                  id="event-recurring"
+                  type="checkbox"
+                  v-model="calendarForm.isRecurring"
+                  class="h-4 w-4 rounded border-gray-300"
+                />
+                <Label for="event-recurring" class="!mt-0 cursor-pointer">Recurring Event</Label>
+              </div>
+
+              <div v-if="calendarForm.isRecurring" class="space-y-4 pl-6">
+                <!-- Days of Week -->
+                <div class="space-y-2">
+                  <Label>Repeat on</Label>
+                  <div class="flex flex-wrap gap-2">
+                    <label
+                      v-for="(day, index) in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
+                      :key="index"
+                      class="flex items-center space-x-1 px-3 py-2 border rounded cursor-pointer"
+                      :class="
+                        calendarForm.recurrence.daysOfWeek.includes(index)
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-background'
+                      "
+                    >
+                      <input
+                        type="checkbox"
+                        :value="index"
+                        v-model="calendarForm.recurrence.daysOfWeek"
+                        class="sr-only"
+                      />
+                      <span class="text-sm">{{ day }}</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Recurrence End -->
+                <div class="space-y-2">
+                  <Label>Ends</Label>
+                  <div class="space-y-2">
+                    <label class="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        value="never"
+                        v-model="calendarForm.recurrence.endType"
+                        class="h-4 w-4"
+                      />
+                      <span class="text-sm">Never</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        value="on"
+                        v-model="calendarForm.recurrence.endType"
+                        class="h-4 w-4"
+                      />
+                      <span class="text-sm">On</span>
+                      <Input
+                        v-if="calendarForm.recurrence.endType === 'on'"
+                        v-model="calendarForm.recurrence.endDate"
+                        type="date"
+                        class="w-auto"
+                        required
+                      />
+                    </label>
+                    <label class="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        value="after"
+                        v-model="calendarForm.recurrence.endType"
+                        class="h-4 w-4"
+                      />
+                      <span class="text-sm">After</span>
+                      <Input
+                        v-if="calendarForm.recurrence.endType === 'after'"
+                        v-model.number="calendarForm.recurrence.endAfterOccurrences"
+                        type="number"
+                        min="1"
+                        class="w-20"
+                        required
+                      />
+                      <span v-if="calendarForm.recurrence.endType === 'after'" class="text-sm"
+                        >occurrences</span
+                      >
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div v-if="calendarError" class="text-sm text-destructive">{{ calendarError }}</div>
             <div class="flex space-x-2">
               <Button type="submit" :disabled="calendarSubmitting">
@@ -283,8 +423,18 @@ const calendarForm = ref({
   description: '',
   location: '',
   startDate: '',
+  startTime: '',
   endDate: '',
+  endTime: '',
+  duration: 1, // in hours
   allDay: false,
+  isRecurring: false,
+  recurrence: {
+    daysOfWeek: [] as number[], // 0=Sunday, 1=Monday, ..., 6=Saturday
+    endType: 'never' as 'never' | 'on' | 'after',
+    endDate: '',
+    endAfterOccurrences: 10,
+  },
 })
 const calendarQuickEditForm = ref({
   description: '',
@@ -325,26 +475,53 @@ const fetchEvents = async () => {
 
 const openCalendarModal = () => {
   editingEvent.value = null
+  const now = new Date()
+  const startDateStr = now.toISOString().slice(0, 10)
+  const startTimeStr = now.toTimeString().slice(0, 5)
   calendarForm.value = {
     title: '',
     description: '',
     location: '',
-    startDate: '',
-    endDate: '',
+    startDate: startDateStr,
+    startTime: startTimeStr,
+    endDate: startDateStr,
+    endTime: startTimeStr,
+    duration: 1,
     allDay: false,
+    isRecurring: false,
+    recurrence: {
+      daysOfWeek: [],
+      endType: 'never',
+      endDate: '',
+      endAfterOccurrences: 10,
+    },
   }
   showCalendarModal.value = true
 }
 
 const editCalendarEvent = (event: any) => {
   editingEvent.value = event
+  const startDate = new Date(event.startDate)
+  const endDate = new Date(event.endDate)
+  const recurrencePattern = event.recurrencePattern ? JSON.parse(event.recurrencePattern) : null
+
   calendarForm.value = {
     title: event.title,
     description: event.description || '',
     location: event.location || '',
-    startDate: new Date(event.startDate).toISOString().slice(0, 16),
-    endDate: new Date(event.endDate).toISOString().slice(0, 16),
+    startDate: startDate.toISOString().slice(0, 10),
+    startTime: startDate.toTimeString().slice(0, 5),
+    endDate: endDate.toISOString().slice(0, 10),
+    endTime: endDate.toTimeString().slice(0, 5),
+    duration: Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)),
     allDay: event.allDay,
+    isRecurring: event.isRecurring || false,
+    recurrence: recurrencePattern || {
+      daysOfWeek: [],
+      endType: 'never',
+      endDate: '',
+      endAfterOccurrences: 10,
+    },
   }
   showCalendarModal.value = true
 }
@@ -354,6 +531,33 @@ const handleCalendarSubmit = async () => {
   calendarSubmitting.value = true
 
   try {
+    // Calculate start and end dates
+    let startDate: Date
+    let endDate: Date
+
+    if (calendarForm.value.allDay) {
+      // For all-day events, use the date as-is
+      startDate = new Date(calendarForm.value.startDate)
+      startDate.setHours(0, 0, 0, 0)
+      endDate = new Date(calendarForm.value.endDate)
+      endDate.setHours(23, 59, 59, 999)
+    } else {
+      // For timed events, combine date and time
+      startDate = new Date(`${calendarForm.value.startDate}T${calendarForm.value.startTime}`)
+      // Calculate end time based on duration
+      endDate = new Date(startDate.getTime() + calendarForm.value.duration * 60 * 60 * 1000)
+    }
+
+    // Prepare recurrence pattern if recurring
+    const recurrencePattern = calendarForm.value.isRecurring
+      ? JSON.stringify({
+          daysOfWeek: calendarForm.value.recurrence.daysOfWeek,
+          endType: calendarForm.value.recurrence.endType,
+          endDate: calendarForm.value.recurrence.endDate || undefined,
+          endAfterOccurrences: calendarForm.value.recurrence.endAfterOccurrences,
+        })
+      : undefined
+
     const url = editingEvent.value ? `/api/calendar/${editingEvent.value.id}` : '/api/calendar'
     const method = editingEvent.value ? 'PUT' : 'POST'
 
@@ -363,9 +567,11 @@ const handleCalendarSubmit = async () => {
         title: calendarForm.value.title,
         description: calendarForm.value.description || undefined,
         location: calendarForm.value.location || undefined,
-        startDate: new Date(calendarForm.value.startDate).toISOString(),
-        endDate: new Date(calendarForm.value.endDate).toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
         allDay: calendarForm.value.allDay,
+        isRecurring: calendarForm.value.isRecurring,
+        recurrencePattern,
       },
     })
 
@@ -400,16 +606,26 @@ const closeCalendarModal = () => {
 const handleCalendarSlotClick = (slotDate: Date) => {
   editingEvent.value = null
   const startDate = new Date(slotDate)
-  const endDate = new Date(slotDate)
-  endDate.setHours(endDate.getHours() + 1) // Default to 1 hour duration
+  const startDateStr = startDate.toISOString().slice(0, 10)
+  const startTimeStr = startDate.toTimeString().slice(0, 5)
 
   calendarForm.value = {
     title: '',
     description: '',
     location: '',
-    startDate: startDate.toISOString().slice(0, 16),
-    endDate: endDate.toISOString().slice(0, 16),
+    startDate: startDateStr,
+    startTime: startTimeStr,
+    endDate: startDateStr,
+    endTime: startTimeStr,
+    duration: 1,
     allDay: false,
+    isRecurring: false,
+    recurrence: {
+      daysOfWeek: [],
+      endType: 'never',
+      endDate: '',
+      endAfterOccurrences: 10,
+    },
   }
   showCalendarModal.value = true
 }

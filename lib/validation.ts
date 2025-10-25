@@ -34,6 +34,8 @@ export const calendarEventSchema = z.object({
   endDate: z.string().datetime(),
   location: z.string().max(200).optional(),
   allDay: z.boolean().default(false),
+  isRecurring: z.boolean().default(false),
+  recurrencePattern: z.string().optional(),
 })
 
 export const updateCalendarEventSchema = calendarEventSchema.partial()

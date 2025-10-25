@@ -6,9 +6,9 @@ export default defineEventHandler(async (event) => {
   try {
     const user = await requireAuth(event)
     const data = await validateBody(event, calendarEventSchema)
-    
+
     const db = getDb(event)
-    
+
     // Create calendar event
     const calendarEvent = await db.calendarEvent.create({
       data: {
@@ -18,22 +18,24 @@ export default defineEventHandler(async (event) => {
         endDate: new Date(data.endDate),
         location: data.location,
         allDay: data.allDay,
-        createdBy: user.userId
+        isRecurring: data.isRecurring,
+        recurrencePattern: data.recurrencePattern,
+        createdBy: user.userId,
       },
       include: {
         creator: {
           select: {
             id: true,
             name: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     })
-    
+
     return {
       success: true,
-      event: calendarEvent
+      event: calendarEvent,
     }
   } catch (error: any) {
     if (error.statusCode) {
@@ -41,8 +43,7 @@ export default defineEventHandler(async (event) => {
     }
     throw createError({
       statusCode: 500,
-      message: 'Internal server error'
+      message: 'Internal server error',
     })
   }
 })
-
