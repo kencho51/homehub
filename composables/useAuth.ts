@@ -7,7 +7,7 @@ export const useAuth = () => {
     try {
       const response = await $fetch('/api/auth/login', {
         method: 'POST',
-        body: { email, password }
+        body: { email, password },
       })
 
       if (response.success && response.token) {
@@ -20,29 +20,7 @@ export const useAuth = () => {
     } catch (error: any) {
       return {
         success: false,
-        message: error.data?.message || 'Login failed'
-      }
-    }
-  }
-
-  const register = async (name: string, email: string, password: string) => {
-    try {
-      const response = await $fetch('/api/auth/register', {
-        method: 'POST',
-        body: { name, email, password }
-      })
-
-      if (response.success && response.token) {
-        token.value = response.token
-        user.value = response.user
-        return { success: true }
-      }
-
-      return { success: false, message: 'Registration failed' }
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.data?.message || 'Registration failed'
+        message: error.data?.message || 'Login failed',
       }
     }
   }
@@ -59,8 +37,8 @@ export const useAuth = () => {
     try {
       const response = await $fetch('/api/auth/me', {
         headers: {
-          Authorization: `Bearer ${token.value}`
-        }
+          Authorization: `Bearer ${token.value}`,
+        },
       })
 
       if (response.success) {
@@ -78,9 +56,7 @@ export const useAuth = () => {
     user,
     isAuthenticated,
     login,
-    register,
     logout,
-    fetchUser
+    fetchUser,
   }
 }
-

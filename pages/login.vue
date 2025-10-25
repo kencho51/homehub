@@ -28,10 +28,6 @@
             {{ loading ? 'Signing in...' : 'Sign in' }}
           </Button>
         </form>
-        <div class="mt-4 text-center text-sm">
-          Don't have an account?
-          <NuxtLink to="/register" class="text-primary hover:underline"> Register </NuxtLink>
-        </div>
       </CardContent>
     </Card>
   </div>
